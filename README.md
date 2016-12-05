@@ -9,6 +9,10 @@ Native MongoDB driver for Swift, written in Swift. This library does not wrap ar
 - Our own [MD5, SHA1, SCRAM and PBKDF2 libraries](https://github.com/OpenKitten/CryptoKitten) in 100% Swift (currently included in the package)
 - Optional support for SSL/TLS using LibreSSL
 
+## Survey
+
+[We've got a survey running](https://www.surveymonkey.com/r/FQ8KT2Y). Please let us know what you think of MongoKitten. If you've still got questions/opinions you want to share, please create an issue on github.
+
 ## Documentation
 
 This can be found [here](http://openkitten.github.io/MongoKitten/) or you could use our [wiki](https://github.com/openkitten/mongokitten/wiki).
