@@ -7,7 +7,8 @@
 //
 
 import Foundation
-import TLS
+//import TLS
+import SSLService
 
 /// The location of a Mongo server - i.e. server name and port number
 public struct MongoHost: Equatable, ExpressibleByStringLiteral {
@@ -60,7 +61,9 @@ public struct SSLSettings: ExpressibleByBooleanLiteral {
         self.invalidCertificateAllowed = false
     }
     
-    public var certificates: Certificates = .openbsd
+//    public var certificates: Certificates = .openbsd
+    
+    public var configuration: SSLService.Configuration?
     
     /// Enable SSL
     public let enabled: Bool

@@ -418,7 +418,7 @@ public final class Server {
         }
         
         // try tcpType.open(address: lowestOpenConnections.hostname, port: lowestOpenConnections.port, options: self.clientSettings)
-        let connection = Connection(client: try IBMSocket.open(address: lowestOpenConnections.hostname, port: lowestOpenConnections.port, options: self.clientSettings), writable: lowestOpenConnections.isPrimary, host: lowestOpenConnections, logger: self.logger) {
+        let connection = Connection(client: try Socket.open(address: lowestOpenConnections.hostname, port: lowestOpenConnections.port, options: self.clientSettings), writable: lowestOpenConnections.isPrimary, host: lowestOpenConnections, logger: self.logger) {
             self.hostPoolLock.lock()
             for (id, server) in self.servers.enumerated() where server == lowestOpenConnections {
                 var host = server
@@ -451,7 +451,7 @@ public final class Server {
     }
     
     private func makeConnection(toHost host: MongoHost, authenticatedFor: Database?) throws -> Connection {
-        let connection = Connection(client: try IBMSocket.open(address: host.hostname, port: host.port, options: self.clientSettings), writable: host.isPrimary, host: host, logger: logger) {
+        let connection = Connection(client: try Socket.open(address: host.hostname, port: host.port, options: self.clientSettings), writable: host.isPrimary, host: host, logger: logger) {
             self.hostPoolLock.lock()
             for (id, server) in self.servers.enumerated() where server == host {
                 var host = server

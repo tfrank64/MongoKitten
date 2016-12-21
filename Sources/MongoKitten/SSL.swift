@@ -33,15 +33,14 @@ import Foundation
     }
 }*/
 
-extension IBMSocket: MongoTCP {
+extension Socket: MongoTCP {
     
     // close and isConnected in Socket.swift
     
     public static func open(address hostname: String, port: UInt16, options: ClientSettings) throws -> MongoTCP {
         
         let socket = try Socket.create() // tcp socket
-        if let settings = options.sslSettings, settings.enabled {
-            let myConfig = SSLService.Configuration(withCACertificateDirectory: nil, usingCertificateFile: "", withKeyFile: "")
+        if let settings = options.sslSettings, settings.enabled, let myConfig = settings.configuration {
             socket.delegate = try SSLService(usingConfiguration: myConfig)
         }
         
