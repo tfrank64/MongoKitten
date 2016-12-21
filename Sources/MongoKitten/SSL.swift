@@ -1,8 +1,12 @@
-import Socks
-import SocksCore
-import TLS
+//import Socks
+//import SocksCore
+//import TLS
 
-extension TLS.Socket: MongoTCP {
+import SSLService
+import Socket
+import Foundation
+
+/*extension TLS.Socket: MongoTCP {
     public static func open(address hostname: String, port: UInt16, options: ClientSettings) throws -> MongoTCP {
         let address = hostname.lowercased() == "localhost" ? InternetAddress.localhost(port: port) : InternetAddress.init(hostname: hostname, port: port)
         
@@ -27,4 +31,36 @@ extension TLS.Socket: MongoTCP {
     public var isConnected: Bool {
         return !socket.closed
     }
+}*/
+
+extension IBMSocket: MongoTCP {
+    
+    // close and isConnected in Socket.swift
+    
+    public static func open(address hostname: String, port: UInt16, options: ClientSettings) throws -> MongoTCP {
+        
+        let socket = try Socket.create() // tcp socket
+        if let settings = options.sslSettings, settings.enabled {
+            let myConfig = SSLService.Configuration(withCACertificateDirectory: nil, usingCertificateFile: "", withKeyFile: "")
+            socket.delegate = try SSLService(usingConfiguration: myConfig)
+        }
+        
+        try socket.listen(on: Int(port))
+        
+        return socket
+    }
+    
+    public func receive() throws -> [UInt8] {
+        let max = Int(UInt16.max)
+        let pointer = UnsafeMutablePointer<CChar>.allocate(capacity: max)
+        let byteCount = try self.read(into: pointer, bufSize: max)
+        let array = Array(UnsafeBufferPointer(start: pointer, count: byteCount))
+        let bytes = array.map { UInt8($0) }
+        return bytes
+    }
+    
+    public func send(data binary: [UInt8]) throws {
+        try self.write(from: Data(bytes: binary))
+    }
+    
 }
