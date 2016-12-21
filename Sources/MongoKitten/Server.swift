@@ -13,11 +13,13 @@
     import Darwin.C
 #endif
 
-import Socks
-import TLS
+//import Socks
+//import TLS
+import SSLService
+import Socket
 
-public let DefaultTCPClient: MongoTCP.Type = Socks.TCPClient.self
-public let DefaultSSLTCPClient: MongoTCP.Type = TLS.Socket.self
+//public let DefaultTCPClient: MongoTCP.Type = Socks.TCPClient.self
+//public let DefaultSSLTCPClient: MongoTCP.Type = TLS.Socket.self
 
 @_exported import BSON
 
@@ -168,7 +170,7 @@ public final class Server {
     private var connections = [Connection]()
     
     /// `MongoTCP` class to use for clients
-    public let tcpType: MongoTCP.Type
+//    public let tcpType: MongoTCP.Type
     
     /// Semaphore to use for safely managing connections
     private let connectionPoolSemaphore: DispatchSemaphore
@@ -204,10 +206,9 @@ public final class Server {
         self.clientSettings = clientSettings
 
         if let sslSettings = clientSettings.sslSettings {
-            self.tcpType = sslSettings.enabled ? DefaultSSLTCPClient : DefaultTCPClient
+//            self.tcpType = sslSettings.enabled ? DefaultSSLTCPClient : DefaultTCPClient
+
             self.sslVerify = !sslSettings.invalidCertificateAllowed
-        } else {
-            self.tcpType = DefaultTCPClient
         }
 
         self.connectionPoolSemaphore = DispatchSemaphore(value: self.clientSettings.maxConnectionsPerServer * self.clientSettings.hosts.count)
@@ -416,7 +417,8 @@ public final class Server {
             throw MongoError.noServersAvailable
         }
         
-        let connection = Connection(client: try tcpType.open(address: lowestOpenConnections.hostname, port: lowestOpenConnections.port, options: self.clientSettings), writable: lowestOpenConnections.isPrimary, host: lowestOpenConnections, logger: self.logger) {
+        // try tcpType.open(address: lowestOpenConnections.hostname, port: lowestOpenConnections.port, options: self.clientSettings)
+        let connection = Connection(client: try IBMSocket.open(address: lowestOpenConnections.hostname, port: lowestOpenConnections.port, options: self.clientSettings), writable: lowestOpenConnections.isPrimary, host: lowestOpenConnections, logger: self.logger) {
             self.hostPoolLock.lock()
             for (id, server) in self.servers.enumerated() where server == lowestOpenConnections {
                 var host = server
@@ -449,7 +451,7 @@ public final class Server {
     }
     
     private func makeConnection(toHost host: MongoHost, authenticatedFor: Database?) throws -> Connection {
-        let connection = Connection(client: try tcpType.open(address: host.hostname, port: host.port, options: self.clientSettings), writable: host.isPrimary, host: host, logger: logger) {
+        let connection = Connection(client: try IBMSocket.open(address: host.hostname, port: host.port, options: self.clientSettings), writable: host.isPrimary, host: host, logger: logger) {
             self.hostPoolLock.lock()
             for (id, server) in self.servers.enumerated() where server == host {
                 var host = server
