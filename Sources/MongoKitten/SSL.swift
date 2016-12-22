@@ -40,21 +40,21 @@ extension Socket: MongoTCP {
     public static func open(address hostname: String, port: UInt16, options: ClientSettings) throws -> MongoTCP {
         
         let socket = try Socket.create() // tcp socket
+        print("made socket: \(socket)")
         if let settings = options.sslSettings, settings.enabled, let myConfig = settings.configuration {
             socket.delegate = try SSLService(usingConfiguration: myConfig)
         }
-        
-        try socket.listen(on: Int(port))
-        
+        print("host: \(hostname) and port: \(port)")
+        try socket.connect(to: hostname, port: Int32(port))
         return socket
     }
     
     public func receive() throws -> [UInt8] {
-        let max = Int(UInt16.max)
-        let pointer = UnsafeMutablePointer<CChar>.allocate(capacity: max)
-        let byteCount = try self.read(into: pointer, bufSize: max)
-        let array = Array(UnsafeBufferPointer(start: pointer, count: byteCount))
-        let bytes = array.map { UInt8($0) }
+
+        var myData = Data()
+        _ = try self.read(into: &myData)
+        let bytes = myData.map { UInt8($0) }
+        
         return bytes
     }
     
