@@ -41,6 +41,7 @@ class Connection {
             options["sslEnabled"]  = sslSettings.enabled
             options["invalidCertificateAllowed"]  = sslSettings.invalidCertificateAllowed
             options["invalidHostNameAllowed"] = sslSettings.invalidHostNameAllowed
+            options["certificateString"] = sslSettings.certificateString
         } else {
             options["sslEnabled"]  = false
         }

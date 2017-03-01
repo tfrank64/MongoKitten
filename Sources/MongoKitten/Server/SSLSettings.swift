@@ -15,6 +15,9 @@ public struct SSLSettings: ExpressibleByBooleanLiteral {
         self.invalidHostNameAllowed = false
         self.invalidCertificateAllowed = false
     }
+    
+    /// Stores a PEM certificate in a String for `SSLService.Configuration` later.
+    public var certificateString: String?
 
     /// Enable SSL
     public let enabled: Bool
